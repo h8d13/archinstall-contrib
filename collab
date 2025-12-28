@@ -1,3 +1,4 @@
 #!/bin/sh
+# usage collab <user> <branch> <fork-name>
 provider="https://github.com"
 git clone -b "$2" "$provider/$1/$3"
