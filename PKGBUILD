@@ -7,11 +7,12 @@ arch=('any')
 url="https://github.com/h8d13/archinstall-contrib"
 license=('GPL')
 depends=('git' 'python')
-source=("$pkgname-$pkgver.tar.gz::https://github.com/h8d13/$pkgname/archive/refs/tags/v$pkgver.tar.gz")
+makedepends=('git')
+source=("git+https://github.com/h8d13/archinstall-contrib.git")
 sha256sums=('SKIP')
 
 package() {
-    cd "$startdir"
+    cd "$srcdir/$pkgname"
 
     # Install main wrapper
     install -Dm755 ac "$pkgdir/usr/bin/ac"
