@@ -5,7 +5,7 @@ pkgrel=0
 pkgdesc="Wrapper scripts for archinstall collaboration and development"
 arch=('any')
 url="https://github.com/h8d13/archinstall-contrib"
-depends=('git' 'python' 'archinstall')
+depends=('git' 'python')
 
 package() {
     cd "$startdir"
