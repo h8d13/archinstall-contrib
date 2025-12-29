@@ -1,22 +1,26 @@
 #!/bin/sh
 
-##constants##
-# less typing more working
-dev_flags=(--debug --verbose)
-# adapt if using gitlab or other
-provider="https://github.com"
-#############
+# source config
+. "$(dirname "$0")/aic.conf"
 
-# usage collab [-c] <user> <repo> [branch]
+# usage collab [-cB] <user> <repo> [branch]
 # -c: clean up clone after use
+# -B: don't write bytecode (.pyc files)
 # examples
 # collab archlinux archinstall master
-# collab -c h8d13 archinstall-patch dot-resume
-# if not branch is provided we remove the -b altogether from constructor
+# collab -cB h8d13 archinstall-patch dot-resume
 
-# parse clean flag like a trap
+# if not branch is provided we remove the -b altogether from constructor
+# and clone as the repo name instead 
+
+# parse flags
 clean_after=0
+py_flags=""
 [ "$1" = "-c" ] && clean_after=1 && shift
+[ "$1" = "-B" ] && py_flags="-B" && shift
+[[ "$1" =~ ^-[cB]+$ ]] && [[ "$1" == *c* ]] && clean_after=1
+[[ "$1" =~ ^-[cB]+$ ]] && [[ "$1" == *B* ]] && py_flags="-B"
+[[ "$1" =~ ^-[cB]+$ ]] && shift
 
 # determine we have at least arg1 | arg2
 [ $# -lt 2 ] && echo "Usage: collab [-c] <user> <repo> [branch]" >&2 && exit 1
@@ -41,7 +45,7 @@ git clone $branch_arg "$provider/$1/$2" "$target_dir"
 
 # run main module with dev flags
 cd "$target_dir" || exit 1
-sudo python -m archinstall "${dev_flags[@]}"
+sudo python $py_flags -m archinstall "${dev_flags[@]}"
 
 # cleanup if flag was set
 [ $clean_after -eq 1 ] && cd .. && sudo rm -rf "$target_dir" && echo "Cleaned up $target_dir"
