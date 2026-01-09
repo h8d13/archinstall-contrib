@@ -5,21 +5,26 @@ Injects rescue.py into archinstall.scripts and executes it.
 """
 import sys
 import os
+import subprocess
 from pathlib import Path
 import importlib.util
 
 def inject_and_run():
+    cwd = Path.cwd()
+
+    # Clone archinstall if not present (repo contains archinstall/ package inside)
+    if not (cwd / 'archinstall' / 'archinstall').exists():
+        print("Cloning archinstall from source...")
+        subprocess.run(["git", "clone", "--depth", "1", "https://github.com/archlinux/archinstall"], cwd=cwd)
+
     # Check if running as root, if not re-exec with sudo
     if os.geteuid() != 0:
         print("Rescue mode requires root privileges. Re-executing with sudo...")
         os.execvp('sudo', ['sudo', '--preserve-env=PYTHONPATH', sys.executable] + sys.argv)
         return
-    # Find directory containing 'archinstall' folder in cwd
-    cwd = Path.cwd()
-    for item in cwd.iterdir():
-        if item.is_dir() and (item / 'archinstall').exists():
-            sys.path.insert(0, str(item))
-            break
+
+    # Add archinstall repo to path (contains archinstall/ package inside)
+    sys.path.insert(0, str(cwd / 'archinstall'))
 
     # Get the directory where this script is located
     script_dir = Path(__file__).parent.resolve()

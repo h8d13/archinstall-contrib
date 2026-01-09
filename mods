@@ -16,6 +16,8 @@ arg1="$1"
 [ "$arg1" = "rs" ] && arg1="rescue"
 shift
 
-cmd="/usr/lib/ac/$arg1"
+script_dir="$(dirname "$(readlink -f "$0")")"
+cmd="$script_dir/aic-lib/$arg1"
+[ ! -f "$cmd" ] && cmd="/usr/lib/ac/$arg1"
 [ ! -f "$cmd" ] && echo "Error: Unknown command '$arg1'" && exit 1
 "$cmd" "$@"
